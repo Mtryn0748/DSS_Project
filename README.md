@@ -1,0 +1,1 @@
+"Projenin githuba yüklenmesi için readme açıldı".
