@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+
+# Üretilen dosyalar (config.py + gen_data.py ile yeniden üretilir)
+data/siparisler.csv
+data/sentetik_siparisler.csv
+models/*.joblib
+
+# Gizli bilgiler (API anahtarı varsa asla push'lanmamalı)
+.env
+.streamlit/secrets.toml
+
+# Editör ve sistem dosyaları
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
