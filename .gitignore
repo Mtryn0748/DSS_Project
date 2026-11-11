@@ -9,7 +9,7 @@ env/
 data/siparisler.csv
 data/sentetik_siparisler.csv
 models/*.joblib
-results/*.csv
+
 KPI_proc/*
 
 # Gizli bilgiler (API anahtarı varsa asla push'lanmamalı)

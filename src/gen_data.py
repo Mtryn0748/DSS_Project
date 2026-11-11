@@ -87,13 +87,17 @@ def miktar_uret(kat, rng):
     return round(miktar, 1) if kat["birim"] == "litre" else int(round(miktar))
 
 
-def iskonto_orani(kat, miktar):
-    """Toplu alım indirimi (%). En yüksek geçerli kademe uygulanır."""
+def iskonto_orani(kat, miktar, ted=None):
+    """
+    Toplu alım indirimi (%). En yüksek geçerli kademe uygulanır.
+    Tedarikçinin iskonto_carpani varsa çarpılır (büyük toptancı daha cömert, küçük yerel dükkan daha az).
+    """
     oran = 0
     for esik, yuzde in kat["iskonto"]:
         if miktar >= esik:
             oran = yuzde
-    return oran
+    carpan = ted.get("iskonto_carpani", 1.0) if ted else 1.0
+    return round(oran * carpan, 1)
 
 
 def sac_teslim_araligi(miktar_kg):
@@ -120,7 +124,7 @@ def nakliye_maliyeti(ted, yakit_endeksi):
 # ---------------------------------------------------------------------------
 def beklenen_gecikme(ted, kat, miktar, ay, acil):
     """Ortalama gecikme (gün). Gerçekleşen gecikme bunun etrafında rastgele çıkar."""
-    ort = 0.33 * ted["hiz"] * (1 + ted["km"] / 600)     # uzak ve yavaş tedarikçi geç kalır
+    ort = 0.2 * ted["hiz"] * (1 + ted["km"] / 600)     # uzak ve yavaş tedarikçi geç kalır
     if ay in cfg.YOGUN_AYLAR:
         ort *= cfg.YOGUNLUK_GECIKME_CARPANI            # tedarikçi yoğun
     if ay in cfg.SOGUK_AYLAR:
@@ -136,7 +140,7 @@ def sorun_olasiligi(ted, kat, miktar, ay):
     """Bir kalemin sorunlu çıkma olasılığı."""
     p = kat["sorun_taban"] * ted["sorun_egilimi"]
     if ay in cfg.YOGUN_AYLAR:
-        p *= 1.8                                       # yoğunlukta hata artar
+        p *= 1.4                                       # yoğunlukta hata artar
     if kat is cfg.KATEGORILER["Sac"] and miktar / cfg.KASA_KG > 5:
         p *= 1.3
     return min(p, 0.9)
@@ -150,8 +154,8 @@ def sonuc_uret(ted, kat, miktar, ay, acil, rng):
     sorunlu = rng.binomial(kalem, sorun_olasiligi(ted, kat, miktar, ay))
     sorun_orani = sorunlu / kalem
 
-    kismi = rng.random() < 0.015 + 0.01 * ted["sorun_egilimi"]
-    iptal = rng.random() < 0.008 + 0.004 * ted["sorun_egilimi"]
+    kismi = rng.random() < 0.008 + 0.005 * ted["sorun_egilimi"]
+    iptal = rng.random() < 0.004 + 0.003 * ted["sorun_egilimi"]
     return gecikme, sorun_orani, kismi, iptal
 
 
@@ -189,7 +193,7 @@ def uret():
         # --- Fiyat ---
         birim_fiyat = kat["baz_fiyat"] * ted["fiyat_endeksi"] * fiyat_katsayisi(tarih)
         birim_fiyat *= rng.normal(1.0, 0.03)                    # piyasa dalgalanması
-        iskonto = iskonto_orani(kat, miktar)
+        iskonto = iskonto_orani(kat, miktar, ted)
         kivirma = kat.get("kivirma_tl_kg", {}).get(ted_ad, 0.0) * fiyat_katsayisi(tarih)
 
         mal_bedeli = miktar * (birim_fiyat * (1 - iskonto / 100) + kivirma)

@@ -191,7 +191,7 @@ def siparis_satirlari(kategori, miktar, ay, acil):
             kategori=kategori, tedarikci=ad, yontem=ted["yontem"], km=ted["km"],
             yogun_ay=int(ay in cfg.YOGUN_AYLAR), soguk_ay=int(ay in cfg.SOGUK_AYLAR),
             log_miktar=np.log1p(miktar), acil=int(acil),
-            iskonto_yuzde=gen_data.iskonto_orani(kat, miktar), sozlesme_gun=sozlesme))
+            iskonto_yuzde=gen_data.iskonto_orani(kat, miktar, ted), sozlesme_gun=sozlesme))
     return pd.DataFrame(satirlar)
 
 

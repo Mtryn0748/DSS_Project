@@ -1,0 +1,6 @@
+﻿Model,AUC (CV ort.),AUC (CV std),Brier,AUC (zaman bölmesi)
+Baz çizgisi (sadece tedarikçi),0.596,0.028,0.145,0.587
+Lojistik Regresyon,0.722,0.031,0.132,0.724
+Random Forest,0.726,0.027,0.133,0.72
+XGBoost,0.731,0.03,0.132,0.735
+SVM (RBF),0.661,0.017,0.139,0.65
